@@ -54,12 +54,12 @@ class Fernet {
      */
     public function __construct($key) {
         if (!function_exists('openssl_random_pseudo_bytes') && !function_exists('mcrypt_create_iv')) {
-            throw new Exception('No backend library found');
+            throw new \Exception('No backend library found');
         }
 
         $key = self::base64url_decode($key);
 
-        if (strlen($key) != 32) throw new Exception('Incorrect key');
+        if (strlen($key) != 32) throw new \Exception('Incorrect key');
 
         $this->signing_key = substr($key, 0, 16);
         $this->encryption_key = substr($key, 16);
@@ -163,7 +163,7 @@ class Fernet {
         } elseif (function_exists('mcrypt_create_iv')) {
             $key = mcrypt_create_iv(32);
         } else {
-            throw new Exception('No backend library found');
+            throw new \Exception('No backend library found');
         }
         return self::base64url_encode($key);
     }
