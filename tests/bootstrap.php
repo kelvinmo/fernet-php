@@ -6,6 +6,8 @@ set_include_path(implode(PATH_SEPARATOR, array(
     get_include_path(),
 )));
 
+chdir(dirname(__FILE__) . '/');
+
 spl_autoload_register(function ($class) {
     $class = ltrim($class, '\\');
 
