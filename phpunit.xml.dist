@@ -4,7 +4,7 @@
     bootstrap="tests/bootstrap.php"
 >
     <testsuites>
-        <testsuite name="My Test Suite">
+        <testsuite name="Fernet-PHP test suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
