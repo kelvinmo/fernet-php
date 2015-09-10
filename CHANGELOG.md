@@ -2,6 +2,7 @@
 
 ## Version 0.3.0
 
+- Corrected system requirements (PHP 5.4 or later)
 - Added Travis CI configuration
 
 ## Version 0.2.0
