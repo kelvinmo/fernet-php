@@ -125,7 +125,7 @@ class Fernet {
 
         $pad = ord($message[strlen($message) - 1]);
         if (substr_count(substr($message, -$pad), chr($pad)) != $pad) return null;
-    
+
         return substr($message, 0, -$pad);
     }
 
@@ -136,7 +136,9 @@ class Fernet {
      * vector
      */
     protected function getIV() {
-        if (function_exists('openssl_random_pseudo_bytes')) {
+        if (function_exists('random_bytes')) {
+            return random_bytes(16);
+        } elseif (function_exists('openssl_random_pseudo_bytes')) {
             return openssl_random_pseudo_bytes(16);
         } elseif (function_exists('mcrypt_create_iv')) {
             return mcrypt_create_iv(16);
@@ -172,7 +174,7 @@ class Fernet {
      *
      * @param string $data the data to encode
      * @param bool $pad whether padding characters should be included
-     * @return string the encoded data 
+     * @return string the encoded data
      * @link http://tools.ietf.org/html/rfc4648#section-5
      */
     static public function base64url_encode($data, $pad = true) {
@@ -185,7 +187,7 @@ class Fernet {
      * Decodes data encoded with Base 64 Encoding with URL and Filename Safe Alphabet.
      *
      * @param string $data the encoded data
-     * @return string|bool the original data or FALSE on failure. The returned data may be binary. 
+     * @return string|bool the original data or FALSE on failure. The returned data may be binary.
      * @link http://tools.ietf.org/html/rfc4648#section-5
      */
     static public function base64url_decode($data) {
