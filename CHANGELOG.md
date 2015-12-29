@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.5.0
+
+- Fixes timing attack vulnerability (#1)
+
 ## Version 0.4.0
 
 - Use native random bytes function under PHP 7
