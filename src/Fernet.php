@@ -105,6 +105,7 @@ class Fernet {
         $signing_base = substr($raw, 0, -32);
         $expected_hash = hash_hmac('sha256', $signing_base, $this->signing_key, true);
 
+        if (!is_string($hash)) return null;
         if (!$this->secureCompare($hash, $expected_hash)) return null;
 
         $parts = unpack('Cversion/Ndummy/Ntime', substr($signing_base, 0, 9));
