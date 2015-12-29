@@ -105,7 +105,7 @@ class Fernet {
         $signing_base = substr($raw, 0, -32);
         $expected_hash = hash_hmac('sha256', $signing_base, $this->signing_key, true);
 
-        if ($hash != $expected_hash) return null;
+        if (!$this->secureCompare($hash, $expected_hash)) return null;
 
         $parts = unpack('Cversion/Ndummy/Ntime', substr($signing_base, 0, 9));
         if (chr($parts['version']) != self::VERSION) return null;
@@ -152,6 +152,24 @@ class Fernet {
      */
     protected function getTime() {
         return time();
+    }
+
+    /**
+     * Compares two strings using the same time whether they're equal or not.
+     * This function should be used to mitigate timing attacks when, for
+     * example, comparing password hashes
+     *
+     * @param string $str1
+     * @param string $str2
+     * @return bool true if the two strings are equal
+     */
+    protected function secureCompare($str1, $str2) {
+        if (function_exists('hash_equals')) return hash_equals($str1, $str2);
+
+        $xor = $str1 ^ $str2;
+        $result = strlen($str1) ^ strlen($str2); //not the same length, then fail ($result != 0)
+        for ($i = strlen($xor) - 1; $i >= 0; $i--) $result += ord($xor[$i]);
+        return !$result;
     }
 
     /**
