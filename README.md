@@ -8,6 +8,7 @@ in PHP.
 - PHP 5.4 or later
 - `hash` extension
 - `openssl` or `mcrypt` extension
+- `mbstring.func_overload` needs to be switched **off** in `php.ini`
 
 ## Installation
 
