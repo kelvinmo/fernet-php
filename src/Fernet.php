@@ -53,16 +53,18 @@ class Fernet {
      * @param $key the Fernet key, encoded in base64url format
      */
     public function __construct($key) {
-        if (!function_exists('openssl_random_pseudo_bytes') && !function_exists('mcrypt_create_iv')) {
+        if (!function_exists('random_bytes') && !function_exists('openssl_random_pseudo_bytes') && !function_exists('mcrypt_create_iv')) {
             throw new \Exception('No backend library found');
         }
 
         $key = self::base64url_decode($key);
 
-        if (strlen($key) != 32) throw new \Exception('Incorrect key');
+        if (self::safeStrlen($key) !== 32) {
+            throw new \Exception('Incorrect key');
+        }
 
-        $this->signing_key = substr($key, 0, 16);
-        $this->encryption_key = substr($key, 16);
+        $this->signing_key = self::safeSubstr($key, 0, 16);
+        $this->encryption_key = self::safeSubstr($key, 16);
     }
 
     /**
@@ -75,7 +77,7 @@ class Fernet {
         $iv = $this->getIV();
 
         // PKCS7 padding
-        $pad = 16 - (strlen($message) % 16);
+        $pad = 16 - (self::safeStrlen($message) % 16);
         $message .= str_repeat(chr($pad), $pad);
 
         if (function_exists('openssl_encrypt')) {
@@ -101,22 +103,28 @@ class Fernet {
     public function decode($token, $ttl = null) {
         $raw = self::base64url_decode($token);
 
-        $hash = substr($raw, -32);
-        $signing_base = substr($raw, 0, -32);
+        $hash = self::safeSubstr($raw, -32);
+        $signing_base = self::safeSubstr($raw, 0, -32);
         $expected_hash = hash_hmac('sha256', $signing_base, $this->signing_key, true);
 
-        if (!is_string($hash)) return null;
-        if (!$this->secureCompare($hash, $expected_hash)) return null;
-
-        $parts = unpack('Cversion/Ndummy/Ntime', substr($signing_base, 0, 9));
-        if (chr($parts['version']) != self::VERSION) return null;
-
-        if ($ttl != null) {
-            if ($parts['time'] + $ttl < $this->getTime()) return null;
+        if (!is_string($hash)) {
+            return null;
+        }
+        if (!$this->secureCompare($hash, $expected_hash)) {
+            return null;
         }
 
-        $iv = substr($signing_base, 9, 16);
-        $ciphertext = substr($signing_base, 25);
+        $parts = unpack('Cversion/Ndummy/Ntime', self::safeSubstr($signing_base, 0, 9));
+        if (chr($parts['version']) != self::VERSION) return null;
+
+        if ($ttl !== null) {
+            if ($parts['time'] + $ttl < $this->getTime()) {
+                return null;
+            }
+        }
+
+        $iv = self::safeSubstr($signing_base, 9, 16);
+        $ciphertext = self::safeSubstr($signing_base, 25);
 
         if (function_exists('openssl_decrypt')) {
             $message = openssl_decrypt(base64_encode($ciphertext), 'aes-128-cbc', $this->encryption_key, OPENSSL_ZERO_PADDING, $iv);
@@ -124,10 +132,12 @@ class Fernet {
             $message = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->encryption_key, $ciphertext, 'cbc', $iv);
         }
 
-        $pad = ord($message[strlen($message) - 1]);
-        if (substr_count(substr($message, -$pad), chr($pad)) != $pad) return null;
+        $pad = ord($message[self::safeStrlen($message) - 1]);
+        if (substr_count(self::safeSubstr($message, -$pad), chr($pad)) !== $pad) {
+            return null;
+        }
 
-        return substr($message, 0, -$pad);
+        return self::safeSubstr($message, 0, -$pad);
     }
 
     /**
@@ -165,12 +175,15 @@ class Fernet {
      * @return bool true if the two strings are equal
      */
     protected function secureCompare($str1, $str2) {
-        if (function_exists('hash_equals')) return hash_equals($str1, $str2);
-
+        if (function_exists('hash_equals')) {
+            return hash_equals($str1, $str2);
+        }
         $xor = $str1 ^ $str2;
-        $result = strlen($str1) ^ strlen($str2); //not the same length, then fail ($result != 0)
-        for ($i = strlen($xor) - 1; $i >= 0; $i--) $result += ord($xor[$i]);
-        return !$result;
+        $result = self::safeStrlen($str1) ^ self::safeStrlen($str2); //not the same length, then fail ($result != 0)
+        for ($i = self::safeStrlen($xor) - 1; $i >= 0; --$i) {
+            $result += ord($xor[$i]);
+        }
+        return $result !== 0;
     }
 
     /**
@@ -179,7 +192,9 @@ class Fernet {
      * @return string a base64url encoded key
      */
     static public function generateKey() {
-        if (function_exists('openssl_random_pseudo_bytes')) {
+        if (function_exists('random_bytes')) {
+            $key = random_bytes(32);
+        } elseif (function_exists('openssl_random_pseudo_bytes')) {
             $key = openssl_random_pseudo_bytes(32);
         } elseif (function_exists('mcrypt_create_iv')) {
             $key = mcrypt_create_iv(32);
@@ -212,5 +227,57 @@ class Fernet {
     static public function base64url_decode($data) {
         return base64_decode(strtr($data, '-_', '+/'));
     }
+    
+    /**
+     * Safe string length
+     *
+     * @staticvar boolean $exists
+     * @param string $str
+     * @return int
+     */
+    static public function safeStrlen($str)
+    {
+        static $exists = null;
+        if ($exists === null) {
+            $exists = function_exists('mb_strlen');
+        }
+        if ($exists) {
+            return mb_strlen($str, '8bit');
+        }
+        return strlen($str);
+    }
+    
+    /**
+     * Safe substring
+     *
+     * @staticvar boolean $exists
+     * @param string $str
+     * @param int $start
+     * @param int $length
+     * @return string
+     */
+    static public function safeSubstr($str, $start, $length = null)
+    {
+        static $exists = null;
+        if ($exists === null) {
+            $exists = function_exists('mb_substr');
+        }
+        if ($exists) {
+            // mb_substr($str, 0, NULL, '8bit') returns an empty string on PHP
+            // 5.3, so we have to find the length ourselves.
+            if (!isset($length)) {
+                if ($start >= 0) {
+                    $length = self::safeStrlen($str) - $start;
+                } else {
+                    $length = -$start;
+                }
+            }
+            return mb_substr($str, $start, $length, '8bit');
+        }
+        // Unlike mb_substr(), substr() doesn't accept NULL for length
+        if (isset($length)) {
+            return substr($str, $start, $length);
+        }
+        return substr($str, $start);
+    }
 }
-?>
