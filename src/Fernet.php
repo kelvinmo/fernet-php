@@ -50,7 +50,7 @@ class Fernet {
     /**
      * Creates an instance of the Fernet encoder/decoder
      *
-     * @param $key the Fernet key, encoded in base64url format
+     * @param string $key the Fernet key, encoded in base64url format
      */
     public function __construct($key) {
         if (!function_exists('openssl_random_pseudo_bytes') && !function_exists('mcrypt_create_iv')) {
