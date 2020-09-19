@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming
+## Version 0.5.1
 
 - Fixed: return null on decode() if an error occurred during decryption
 
