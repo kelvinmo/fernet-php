@@ -150,6 +150,8 @@ class Fernet {
     /**
      * Obtains the current time.
      *
+     * This method is required to facilitate unit testing.
+     *
      * @return int the current time
      */
     protected function getTime() {
