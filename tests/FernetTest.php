@@ -2,6 +2,8 @@
 
 namespace Fernet;
 
+use PHPUnit\Framework\TestCase;
+
 class FernetMock extends Fernet {
     private $time;
 
@@ -28,7 +30,7 @@ class FernetGenerateMock extends FernetMock {
     }
 }
 
-class FernetTest extends \PHPUnit_Framework_TestCase {
+class FernetTest extends TestCase {
 
     public function __construct() {
         parent::__construct();
