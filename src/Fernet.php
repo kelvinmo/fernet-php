@@ -123,6 +123,7 @@ class Fernet {
         } elseif (function_exists('mcrypt_decrypt')) {
             $message = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->encryption_key, $ciphertext, 'cbc', $iv);
         }
+        if ($message === false) return null;
 
         $pad = ord($message[strlen($message) - 1]);
         if (substr_count(substr($message, -$pad), chr($pad)) != $pad) return null;
