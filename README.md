@@ -1,5 +1,8 @@
 # Fernet-PHP
 
+[![Latest Stable Version](https://poser.pugx.org/kelvinmo/fernet-php/v/stable)](https://packagist.org/packages/kelvinmo/fernet-php)
+[![Build Status](https://travis-ci.org/kelvinmo/fernet-php.svg?branch=master)](https://travis-ci.org/kelvinmo/fernet-php)
+
 Fernet-PHP is an implementation of the [Fernet token specification](https://github.com/fernet/spec/blob/master/Spec.md)
 in PHP.
 
