@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming
+## Version 1.0.0
 
 - Removed: Support for PHP 5
 
