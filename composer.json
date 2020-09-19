@@ -2,7 +2,7 @@
     "name": "kelvinmo/fernet-php",
     "description": "An implementation of the Fernet token specification in PHP.",
     "require": {
-        "php": ">=5.4",
+        "php": "^7.0",
         "ext-hash": "*"
     },
     "suggest": {

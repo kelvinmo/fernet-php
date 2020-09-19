@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+- Remove PHP5 compatibility
+
 ## Version 0.5.0
 
 - Fixes timing attack vulnerability (#1)
