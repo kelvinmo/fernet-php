@@ -1,6 +1,6 @@
 # Fernet-PHP
 
-Fernet-PHP implementation of the [Fernet token specification](https://github.com/fernet/spec/blob/master/Spec.md)
+Fernet-PHP is an implementation of the [Fernet token specification](https://github.com/fernet/spec/blob/master/Spec.md)
 in PHP.
 
 ## Requirements
@@ -14,12 +14,8 @@ in PHP.
 
 You can install via [Composer](http://getcomposer.org/).
 
-```json
-{
-    "require": {
-        "kelvinmo/fernet-php": "^1.0"
-    }
-}
+```sh
+composer require kelvinmo/fernet-php
 ```
 
 ## Usage
