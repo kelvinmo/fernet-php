@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+- Fixed: return null on decode() if an error occurred during decryption
+
 ## Version 0.5.0
 
 - Fixes timing attack vulnerability (#1)
