@@ -1,8 +1,13 @@
 {
     "name": "kelvinmo/fernet-php",
     "description": "An implementation of the Fernet token specification in PHP.",
+    "keywords": [
+        "fernet",
+        "token"
+    ],
+    "homepage": "https://github.com/kelvinmo/fernet-php",
     "require": {
-        "php": "^7.0",
+        "php": "^7.0 || ^8.0",
         "ext-hash": "*"
     },
     "suggest": {
