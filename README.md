@@ -5,7 +5,7 @@ in PHP.
 
 ## Requirements
 
-- PHP 5.4 or later
+- PHP 7.0 or later
 - `hash` extension
 - `openssl` or `mcrypt` extension
 - `mbstring.func_overload` needs to be switched **off** in `php.ini`
@@ -17,7 +17,7 @@ You can install via [Composer](http://getcomposer.org/).
 ```json
 {
     "require": {
-        "kelvinmo/fernet-php": "dev-master"
+        "kelvinmo/fernet-php": "^1.0"
     }
 }
 ```

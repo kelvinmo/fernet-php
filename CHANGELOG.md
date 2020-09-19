@@ -2,7 +2,7 @@
 
 ## Upcoming
 
-- Remove PHP5 compatibility
+- Removed: Support for PHP 5
 
 ## Version 0.5.1
 
