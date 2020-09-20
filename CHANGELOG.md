@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added: Support for 64-bit timestamps when using 64-bit version of PHP
+
 ## Version 1.0.0
 
 - Removed: Support for PHP 5
