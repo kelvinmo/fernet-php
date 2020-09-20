@@ -84,7 +84,12 @@ class Fernet {
             $ciphertext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $this->encryption_key, $message, 'cbc', $iv);
         }
 
-        $signing_base = self::VERSION . pack('NN', 0, $this->getTime()) . $iv . $ciphertext;
+        if (PHP_INT_SIZE == 8) {
+            $signing_base = self::VERSION . pack('J', $this->getTime()) . $iv . $ciphertext;
+        } else {
+            $signing_base = self::VERSION . pack('NN', 0, $this->getTime()) . $iv . $ciphertext;
+        }
+        
         $hash = hash_hmac('sha256', $signing_base, $this->signing_key, true);
         return self::base64url_encode($signing_base . $hash);
     }
@@ -108,7 +113,16 @@ class Fernet {
         if (!is_string($hash)) return null;
         if (!$this->secureCompare($hash, $expected_hash)) return null;
 
-        $parts = unpack('Cversion/Ndummy/Ntime', substr($signing_base, 0, 9));
+        if (PHP_INT_SIZE == 8) {
+            $parts = unpack('Cversion/Jtime', substr($signing_base, 0, 9));
+        } else {
+            $parts = unpack('Cversion/Ndummy/Ntime', substr($signing_base, 0, 9));
+
+            // If $parts['dummy'] is not zero, this means the timestamp in the token
+            // is beyond the 32 bit limit
+            if ($parts['dummy'] != 0) return null;
+        }
+        
         if (chr($parts['version']) != self::VERSION) return null;
 
         if ($ttl != null) {
@@ -155,7 +169,7 @@ class Fernet {
      * @return int the current time
      */
     protected function getTime() {
-        return time();
+        return (new \DateTime())->getTimestamp();
     }
 
     /**
