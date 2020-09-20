@@ -21,4 +21,12 @@ spl_autoload_register(function ($class) {
     return;
 });
 
+include 'mock.php';
+
+if (PHP_INT_SIZE == 8) {
+    fwrite(STDERR, "Using 64-bit PHP");
+} else {
+    fwrite(STDERR, "Using 32-bit PHP");
+}
+
 ?>
