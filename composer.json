@@ -15,7 +15,7 @@
         "ext-openssl": "This package requires either the mcrypt or openssl extension."
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0"
+        "phpunit/phpunit": "^6.0 || ^9.0"
     },
     "license": "BSD-3-Clause",
     "authors": [
