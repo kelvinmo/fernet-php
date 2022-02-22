@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased
+## Version 1.0.1
 
 - Added: Support for 64-bit timestamps when using 64-bit version of PHP
-- Changed: `encode()` now throws a `RuntimeException` if an errror occurred
+- Changed: `encode()` now throws a `RuntimeException` if an error occurred
   during encryption
 
 ## Version 1.0.0
