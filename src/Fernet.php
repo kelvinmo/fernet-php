@@ -35,6 +35,8 @@
 
 namespace Fernet;
 
+use \RuntimeException;
+
 /**
  * An implementation of the Fernet token specification in PHP.
  *
@@ -44,7 +46,10 @@ class Fernet {
 
     const VERSION = "\x80";
 
+    /** @var string $encryption_key */
     private $encryption_key;
+
+    /** @var string $signing_key */
     private $signing_key;
 
     /**
@@ -83,6 +88,7 @@ class Fernet {
         } elseif (function_exists('mcrypt_encrypt')) {
             $ciphertext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $this->encryption_key, $message, 'cbc', $iv);
         }
+        if (!isset($ciphertext)) throw new RuntimeException('Encryption error');
 
         if (PHP_INT_SIZE == 8) {
             $signing_base = self::VERSION . pack('J', $this->getTime()) . $iv . $ciphertext;
@@ -137,7 +143,7 @@ class Fernet {
         } elseif (function_exists('mcrypt_decrypt')) {
             $message = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->encryption_key, $ciphertext, 'cbc', $iv);
         }
-        if ($message === false) return null;
+        if (!isset($message) || ($message === false)) return null;
 
         $pad = ord($message[strlen($message) - 1]);
         if (substr_count(substr($message, -$pad), chr($pad)) != $pad) return null;
@@ -159,6 +165,7 @@ class Fernet {
         } elseif (function_exists('mcrypt_create_iv')) {
             return mcrypt_create_iv(16);
         }
+        throw new RuntimeException('Cannot create initialisation vector');
     }
 
     /**
