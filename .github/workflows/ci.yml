@@ -8,7 +8,6 @@ jobs:
     strategy:
       matrix:
         php-versions:
-          - 7.0
           - 7.1
           - 7.2
           - 7.3
@@ -51,7 +50,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.0
-          tools: composer
+          tools: composer, mycrpt, openssl
 
       - name: Get Composer cache directory
         id: composer-cache
